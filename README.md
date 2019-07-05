@@ -41,8 +41,8 @@ virtualenv py2_beam_env && source py2_beam_env/bin/activate && pip install apach
 
 Using code in `pb_to_gcs_with_splits.py`. Change `default_topic` and `default_bucket` parameters to the actual desired values:
 
-default_topic = 'projects/<your-project-id>/topics/<your-topic>'                                                                                                                                                                            
-default_bucket = 'gs://<gs-bucket-name>/data-team/sync/cs_bookings/'  #TODO: change output name depending on cs_bookings or users 
+default_topic = 'projects/\<your-project-id\>/topics/\<your-topic\>'                                                                                                                                                                            
+default_bucket = 'gs://\<gs-bucket-name\>/data-team/sync/cs_bookings/'  #TODO: change output name depending on cs_bookings or users 
 
 The pipeline should be run with command (changing project and temp_location flags to your appropriate values):
 
