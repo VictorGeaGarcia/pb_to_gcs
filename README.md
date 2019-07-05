@@ -37,12 +37,12 @@ virtualenv py2_beam_env && source py2_beam_env/bin/activate && pip install apach
 
 -------------------------------
 
-## FULL SOLUTION (With one issue):
+## PubSub to GCS in streaming:
 
 Using code in `pb_to_gcs_with_splits.py`. Change `default_topic` and `default_bucket` parameters to the actual desired values:
 
 default_topic = 'projects/\<your-project-id\>/topics/\<your-topic\>'                                                                                                                                                                            
-default_bucket = 'gs://\<gs-bucket-name\>/data-team/sync/cs_bookings/'  #TODO: change output name depending on cs_bookings or users 
+default_bucket = 'gs://\<gs-bucket-name\>/data-team/sync/'  
 
 The pipeline should be run with command (changing project and temp_location flags to your appropriate values):
 
@@ -62,24 +62,27 @@ When running the pipeline, if we publish something like:
 gcloud pubsub topics publish ub-poc-topic  --message '{"op": "create","timestamp": 1562229006,"source": "cs_bookings","payload": {"id": 1,"user_id": 24,"vehicle_id": 65,"location_id": 4,"start": 1562229000,"end": 1562229005,"real_end": 1562229004,"status": "whateverstatus"}}'
 ```
 
-the pipeline will start returning errors related to the `pvalue` method imported in the `DiffOutputsFn` class. 
-Error: 
-`NameError: global name 'pvalue' is not defined [while running 'generatedPtransform-398182'`
+will send the message to `cs_bookings` folder.
 
-Solution should be to create a setup.py adding [the class as a different module](https://stackoverflow.com/questions/52874383/gcp-dataflow-apache-beam-problem-import-another-python-file-to-main-py-with-co?rq=1). Similar to [what I have in this other repo](https://github.com/VictorGeaGarcia/Apache-Beam/tree/master/Dataflow_Using_Python_Dependencies)
+Something like (without `vehicle_id`): 
+
+'{"op": "create","timestamp": 1562229006,"source": "users","payload": {"id": 1,"user_id": 24,"location_id": 4,"start": 1562229000,"end": 1562229005,"real_end": 1562229004,"status": "whateverstatus"}}'
+
+will send the message to `users` folder.
 
 
-## BASIC PIPELINE NOT SPLITTING THE OUTPUTS:
-
-Just for showing purposes, there is this other more straightforward pipeline which doesn't split the outputs and actually works. File `pb_to_gcs.py`. The pipeline should be run with command (changing project and temp_location flags to your appropriate values):
-
+#TODO: Right now it doesn't add the proper datetime to the file, and it actually creates an additional folder which makes everything more noisy. It should be possible to modify this with something like the code snippet below. But I didn't have time to try this.
 
 ```python
-python pb_to_gcs.py --streaming --project <your-project-id> --temp_location gs://<your-gcs-bucket>/temp --runner DataflowRunner --experiments=allow_non_updatable_job
+
+class WriteToSeparateFiles(beam.DoFn):
+    def __init__(self, outdir):
+        self.outdir = outdir
+    def process(self, element):
+        writer = filesystems.FileSystems.create(self.outdir + element['some_key'] + '.json')
+        writer.write(element['image'])
+        writer.close()
 ```
-
-#TODO: Right now it doesn't add the proper datetime to the file. There is not a builtin implementation for this in Python SDK - WriteIO module. Maybe it's possible to add a custom implementation, but I'm not sure how feasible it is right now. So the names of the files are not that intuitive.
-
 
 ## ADDITIONAL CONSIDERATIONS:
 
