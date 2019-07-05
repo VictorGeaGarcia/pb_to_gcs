@@ -86,13 +86,9 @@ python pb_to_gcs.py --streaming --project <your-project-id> --temp_location gs:/
 Command for running pipeline has additional parameter --experiments.... because if you don't add it returns the error:
 
 #TODO: Add error
-```ERROR
+```
+
+Workflow failed. Causes: Because of the shape of your pipeline, the Cloud Dataflow job optimizer produced a job graph that is not updatable using the --update pipeline option. This is a known issue that we are working to resolve. See https://issuetracker.google.com/issues/118375066 for information about how to modify the shape of your pipeline to avoid this error. You can override this error and force the submission of the job by specifying the --experiments=allow_non_updatable_job parameter., The stateful transform named 'WriteGCSCommon_cs_bookings/Write/WriteImpl/DoOnce/Decode Values.out/FromValue/ReadStream' is in two or more computations.
 ```
 Adding this parameter make the pipeline not being updatable (anyway currently [Python streaming pipeines are not updatable](https://beam.apache.org/documentation/sdks/python-streaming/#dataflowrunner-specific-features)
 
-
-## OTHER OPTIONS:
-
-Another option would be to use PubSub --> BigQuery directly. Althought this would be writing in Streaming, and therefore incurring in [BigQuery streaming inserts costs](#TODO: add link)
-
-To get a full implementation of all features (using custom names in GCS...), right now it would be needed to use Java SDK with some pipeline like
