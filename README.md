@@ -13,7 +13,7 @@ Official JIRA issue [3] (https://issues.apache.org/jira/browse/BEAM-6860)
 Therefore we need to use beam 2.9.0:
 
 ```python 
-pip install apache-beam===2.9.0
+pip install apache-beam[gcp]===2.9.0
 ```
 
 However when runnining the previous command, it returns an error like:
@@ -30,7 +30,7 @@ Python2 with Apache Beam 2.9.0:
 1. Create virtual environment and install apache-beam===2.9.0"
 
 ```python
-virtualenv py2_beam_env && source py2_beam_env/bin/activate && pip install apache-beam===2.9.0
+virtualenv py2_beam_env && source py2_beam_env/bin/activate && pip install apache-beam[gcp]===2.9.0
 ```
 
 (If your default python is not python2 then do add some flag like: -p python2 in the previous command).
